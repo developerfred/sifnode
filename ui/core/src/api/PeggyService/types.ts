@@ -3,8 +3,12 @@ type TxEventBase<T> = {
   payload: T;
 };
 
-export type TxEventConfCountChanged = {
-  type: "ConfCountChanged";
+export type TxEventEthConfCountChanged = {
+  type: "EthConfCountChanged";
+} & TxEventBase<number>;
+
+export type TxEventSifConfCountChanged = {
+  type: "SifConfCountChanged";
 } & TxEventBase<number>;
 
 export type TxEventEthTxInitiated = {
@@ -23,9 +27,38 @@ export type TxEventSifTxConfirmed = {
   type: "SifTxConfirmed";
 } & TxEventBase<any>;
 
+export type TxEventComplete = {
+  type: "Complete";
+} & TxEventBase<any>;
+
 export type TxEvent =
-  | TxEventConfCountChanged
+  | TxEventEthConfCountChanged
+  | TxEventSifConfCountChanged
   | TxEventEthTxInitiated
   | TxEventEthTxConfirmed
   | TxEventSifTxInitiated
-  | TxEventSifTxConfirmed;
+  | TxEventSifTxConfirmed
+  | TxEventComplete;
+
+export type TxEventPrepopulated = Omit<TxEvent, "txHash"> & { txHash?: string };
+
+export type TxEventEmitter = {
+  emit: (e: TxEventPrepopulated) => void;
+  onTxEvent: (handler: (e: TxEvent) => void) => TxEventEmitter;
+  onEthConfCountChanged: (
+    handler: (e: TxEventEthConfCountChanged) => void
+  ) => TxEventEmitter;
+  onEthTxInitiated: (
+    handler: (e: TxEventEthTxInitiated) => void
+  ) => TxEventEmitter;
+  onEthTxConfirmed: (
+    handler: (e: TxEventEthTxConfirmed) => void
+  ) => TxEventEmitter;
+  onSifTxInitiated: (
+    handler: (e: TxEventSifTxInitiated) => void
+  ) => TxEventEmitter;
+  onSifTxConfirmed: (
+    handler: (e: TxEventSifTxConfirmed) => void
+  ) => TxEventEmitter;
+  onComplete: (handler: (e: TxEventComplete) => void) => TxEventEmitter;
+};
