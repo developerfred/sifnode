@@ -88,7 +88,7 @@ def wait_for_balance(balance_fn, target_balance, max_attempts=30):
             print("got target balance")
             return target_balance
         else:
-            print(f"waiting for target balance t: {target_balance} b:{balance}")
+            print(f"waiting for target balance t: {target_balance} b:{balance} ({float(target_balance)/10**18}, {float(balance)/10**18})")
             attempts += 1
             if attempts >= max_attempts:
                 print_error_message(f"Failed to get target balance of {target_balance}, balance is {balance}")
@@ -103,7 +103,7 @@ def wait_for_sifchain_balance(user, denom, network_password, target_balance, max
 def burn_peggy_coin(user, eth_user, amount):
     command_line = f"""yes {network_password} | sifnodecli tx ethbridge burn {get_user_account(user, network_password)} \
     {eth_user} {amount} {PEGGYETH} \
-    --ethereum-chain-id=3 --from={user} \
+    --ethereum-chain-id=5777 --from={user} \
     --yes"""
     return get_shell_output(command_line)
 
@@ -112,9 +112,9 @@ def amount_in_wei(amount):
     return amount * 10 ** 18
 
 
-network_definition_file = os.environ.get("NETDEF")
+network_definition_file = sys.argv[1]
 if not network_definition_file:
-    print_error_message("missing NETDEF environment variable")
+    print_error_message("missing network_definition_file")
 
 network_password = get_password(network_definition_file)
 if not network_password:

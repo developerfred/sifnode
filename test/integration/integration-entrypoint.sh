@@ -26,6 +26,7 @@ start_relayer() {
   echo ETHEREUM_CONTRACT_ADDRESS $ETHEREUM_CONTRACT_ADDRESS
   echo MONIKER $MONIKER
   echo MNEMONIC $MNEMONIC
+  echo CHAINNET $CHAINNET
   ebrelayer init tcp://0.0.0.0:26657 "$ETHEREUM_WEBSOCKET_ADDRESS" \
                                              "$ETHEREUM_CONTRACT_ADDRESS" \
                                              "$MONIKER" \

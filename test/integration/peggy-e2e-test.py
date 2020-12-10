@@ -114,7 +114,7 @@ def test_case_2():
     print(
         "########## Test Case Two Start: ceth => eth"
     )
-    
+
     amount = 1 * 10 ** 18
 
     operator_balance_before_tx = get_eth_balance(operatorAddress, ETH)
