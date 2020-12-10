@@ -5,6 +5,7 @@ set -e # exit on any failure
 
 # add 18 zeros to a number
 to_wei () { echo "${1}000000000000000000" ; }
+to_json () { ruby -ryaml -rjson -e "puts YAML::load(STDIN.read).to_json"; }
 
 BASEDIR=$(pwd)/$(dirname $0)/../..
 NETWORKDIR=$BASEDIR/deploy/networks
@@ -67,6 +68,7 @@ BASEDIR=${BASEDIR} rake genesis:network:boot["localnet,${ETHEREUM_CONTRACT_ADDRE
 # wait for it to appear
 
 NETDEF=$NETWORKDIR/network-definition.yml
+echo "export NETDEF=$NETDEF" >> $envexportfile
 while [ ! -f $NETWORKDIR/network-definition.yml ]
 do
   sleep 2
@@ -74,6 +76,9 @@ done
 
 PASSWORD=$(cat $NETDEF | yq r - ".password")
 ADDR=$(cat $NETDEF | yq r - ".address")
+export MONIKER=$(cat ${NETWORKDIR}/network-definition.yml | to_json | jq '.[0].moniker')
+echo "export MONIKER=$MONIKER" >> $envexportfile
+
 echo $PASSWORD
 echo $ADDR
 
@@ -119,8 +124,8 @@ docker exec ${CONTAINER_NAME} bash -c "cd /smart-contracts && yarn install"
 # Run the python tests
 #
 echo run python tests
-docker exec ${CONTAINER_NAME} bash -c ". /test/integration/vagrantenv.sh; SMART_CONTRACTS_DIR=/smart-contracts python3 /test/integration/peggy-basic-test-docker.py /network-definition.yml"
 docker exec ${CONTAINER_NAME} bash -c '. /test/integration/vagrantenv.sh; SMART_CONTRACTS_DIR=/smart-contracts python3 /test/integration/peggy-e2e-test.py /network-definition.yml'
+docker exec ${CONTAINER_NAME} bash -c ". /test/integration/vagrantenv.sh; SMART_CONTRACTS_DIR=/smart-contracts python3 /test/integration/peggy-basic-test-docker.py /network-definition.yml"
 
 # killing script will not end network use stop-integration-env.sh for that
 # and note that we just allow the github actions environment to be cleaned

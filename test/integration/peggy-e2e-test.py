@@ -114,13 +114,16 @@ def test_case_2():
     print(
         "########## Test Case Two Start: ceth => eth"
     )
+    
+    amount = 1 * 10 ** 18
+
     operator_balance_before_tx = get_eth_balance(operatorAddress, ETH)
     user_sifchain_balance_before_tx = get_sifchain_balance(USER, PEGGYETH, network_password)
-    print(f"starting user_eth_balance_before_tx {operator_balance_before_tx}, user_sifchain_balance_before_tx {user_sifchain_balance_before_tx}, amount {AMOUNT}")
-    burn_peggy_coin(USER, operatorAddress, AMOUNT)
+    print(f"starting user_eth_balance_before_tx {operator_balance_before_tx}, user_sifchain_balance_before_tx {user_sifchain_balance_before_tx}, amount {amount}")
+    burn_peggy_coin(USER, operatorAddress, amount)
 
-    wait_for_eth_balance(operatorAddress, ETH, operator_balance_before_tx + AMOUNT)
-    wait_for_sifchain_balance(USER, PEGGYETH, network_password, user_sifchain_balance_before_tx - AMOUNT)
+    wait_for_sifchain_balance(USER, PEGGYETH, network_password, user_sifchain_balance_before_tx - amount)
+    wait_for_eth_balance(operatorAddress, ETH, operator_balance_before_tx + amount)
     print("########## Test Case Two Over ##########")
 
 
@@ -184,7 +187,7 @@ def test_case_4():
 
 
 test_case_2()
-test_case_1()
+# test_case_1()
 
 # TODO enable more test cases
 

@@ -26,8 +26,6 @@ smart_contracts_dir = os.environ.get("SMART_CONTRACTS_DIR")
 if not bridge_bank_address:
     print_error_message("SMART_CONTRACTS_DIR env var is required")
 
-BASEDIR = sys.argv[0]
-
 
 def test_log_line(s):
     test_log(s + "\n")
@@ -114,9 +112,10 @@ def amount_in_wei(amount):
     return amount * 10 ** 18
 
 
-network_definition_file = sys.argv[1]
+network_definition_file = os.environ.get("NETDEF")
 if not network_definition_file:
-    print_error_message("missing network_definition_file argument")
+    print_error_message("missing NETDEF environment variable")
+
 network_password = get_password(network_definition_file)
 if not network_password:
     print_error_message(f"unable to read network password from {network_definition_file}")

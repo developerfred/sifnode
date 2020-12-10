@@ -35,4 +35,4 @@ cmds:
 	vagrant ssh -c "docker exec integration_sifnode1_1 cat /tmp/testrun.sh"
 
 cmdsrm:
-	vagrant ssh -c "docker exec integration_sifnode1_1 bash -c 'rm /tmp/testrun.sh'"
+	vagrant ssh -c "docker exec integration_sifnode1_1 bash -c 'rm -f /tmp/testrun.sh'"
