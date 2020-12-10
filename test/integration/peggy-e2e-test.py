@@ -1,9 +1,9 @@
 import json
-import json
 import re
 import time
+import os
 
-from test_utilities import get_shell_output
+from test_utilities import get_shell_output, PEGGYETH, burn_peggy_coin
 from test_utilities import print_error_message, get_user_account, get_sifchain_balance, network_password, \
     bridge_bank_address, \
     smart_contracts_dir, wait_for_sifchain_balance, wait_for_balance
@@ -11,7 +11,6 @@ from test_utilities import print_error_message, get_user_account, get_sifchain_b
 # define users
 USER = "user1"
 ROWAN = "rowan"
-PEGGYETH = "ceth"
 PEGGYROWAN = "erowan"
 ETH = "eth"
 ETH_CONTRACT = "0x0000000000000000000000000000000000000000"
@@ -22,7 +21,9 @@ CLAIMLOCK = "lock"
 CLAIMBURN = "burn"
 
 ETH_OPERATOR = "0x627306090abaB3A6e1400e9345bC60c78a8BEf57"
-ETH_ACCOUNT = "0xf17f52151EbEF6C7334FAD080c5704D77216b732"
+ETH_ACCOUNT = os.environ.get("USER1ADDR")
+user1EthAddress = "0x4Bbb1BB825003eC701545524AaBDDCa1B970502C"
+operatorAddress = "0xf17f52151EbEF6C7334FAD080c5704D77216b732"
 ROWAN_CONTRACT = "0x409Ba3dd291bb5D48D5B4404F5EFa207441F6CbA"
 
 if smart_contracts_dir is None:
@@ -85,14 +86,6 @@ def get_account_nonce(user):
     return json_str["value"]["sequence"]
 
 
-def burn_peggy_coin(user, eth_user, amount):
-    command_line = f"""yes {network_password} | sifnodecli tx ethbridge burn {get_user_account(user, network_password)} \
-    {eth_user} {amount} {PEGGYETH} \
-    --ethereum-chain-id=3 --from={user} \
-    --yes"""
-    return get_shell_output(command_line)
-
-
 def lock_rowan(user, eth_user, amount):
     command_line = f"""yes {network_password} | sifnodecli tx ethbridge lock {get_user_account(user, network_password)} \
         {eth_user} {amount} rwn \
@@ -119,36 +112,15 @@ def test_case_1():
 
 def test_case_2():
     print(
-        "########## Test Case Two Start: burn ceth in sifchain then eth back to ethereum"
+        "########## Test Case Two Start: ceth => eth"
     )
-    operator_balance_before_tx = int(get_eth_balance(ETH_ACCOUNT, ETH))
-    contract_balance_before_tx = int(get_eth_balance(bridge_bank_address, ETH))
-    balance_before_tx = int(get_sifchain_balance(USER, PEGGYETH, network_password))
-    print("Before lock transaction {}'s balance of {} is {}".format(
-        ETH_ACCOUNT, ETH, operator_balance_before_tx))
-    print("Before lock transaction contract {}'s balance of {} is {}".format(
-        bridge_bank_address, ETH, contract_balance_before_tx))
-    print("Before burn transaction {}'s balance of {} is {}".format(
-        USER, PEGGYETH, balance_before_tx))
-    print("Send lock claim to Sifchain...")
-    if balance_before_tx < AMOUNT:
-        print_error_message("No enough peggyeth to burn")
-        return
-    burn_peggy_coin(USER, ETH_ACCOUNT, AMOUNT)
-    time.sleep(SLEEPTIME)
-    operator_balance_after_tx = int(get_eth_balance(ETH_ACCOUNT, ETH))
-    contract_balance_after_tx = int(get_eth_balance(bridge_bank_address, ETH))
-    balance_after_tx = int(get_sifchain_balance(USER, PEGGYETH, network_password))
-    print("After lock transaction {}'s balance of {} is {}".format(
-        ETH_ACCOUNT, ETH, operator_balance_after_tx))
-    print("After lock transaction contract {}'s balance of {} is {}".format(
-        bridge_bank_address, ETH, contract_balance_after_tx))
-    print("After lock transaction {}'s balance of {} is {}".format(
-        USER, PEGGYETH, balance_after_tx))
-    if balance_after_tx != balance_before_tx - AMOUNT:
-        print_error_message("balance is wrong after send eth lock claim")
-    if contract_balance_before_tx != contract_balance_after_tx + AMOUNT:
-        print_error_message("bridge contract's balance is wrong after send eth lock claim")
+    operator_balance_before_tx = get_eth_balance(operatorAddress, ETH)
+    user_sifchain_balance_before_tx = get_sifchain_balance(USER, PEGGYETH, network_password)
+    print(f"starting user_eth_balance_before_tx {operator_balance_before_tx}, user_sifchain_balance_before_tx {user_sifchain_balance_before_tx}, amount {AMOUNT}")
+    burn_peggy_coin(USER, operatorAddress, AMOUNT)
+
+    wait_for_eth_balance(operatorAddress, ETH, operator_balance_before_tx + AMOUNT)
+    wait_for_sifchain_balance(USER, PEGGYETH, network_password, user_sifchain_balance_before_tx - AMOUNT)
     print("########## Test Case Two Over ##########")
 
 
@@ -211,10 +183,10 @@ def test_case_4():
     print("########## Test Case Four Over ##########")
 
 
+test_case_2()
 test_case_1()
 
 # TODO enable more test cases
 
-# test_case_2()
 # test_case_3()
 # test_case_4()

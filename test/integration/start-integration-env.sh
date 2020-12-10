@@ -119,8 +119,6 @@ docker exec ${CONTAINER_NAME} bash -c "cd /smart-contracts && yarn install"
 # Run the python tests
 #
 echo run python tests
-echo ADDR $ADDR
-echo USER1ADDR $USER1ADDR
 docker exec ${CONTAINER_NAME} bash -c ". /test/integration/vagrantenv.sh; SMART_CONTRACTS_DIR=/smart-contracts python3 /test/integration/peggy-basic-test-docker.py /network-definition.yml"
 docker exec ${CONTAINER_NAME} bash -c '. /test/integration/vagrantenv.sh; SMART_CONTRACTS_DIR=/smart-contracts python3 /test/integration/peggy-e2e-test.py /network-definition.yml'
 

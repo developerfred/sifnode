@@ -8,10 +8,11 @@ The [setup-linux-environment.sh](./setup-linux-environment.sh) script will insta
 
 Run `make` in test/integration/vagrant.  That uses [vagrant](https://www.vagrantup.com/docs/installation) to set up a fresh Linux environment with all the tools necessary for building and running the tests.  It will:
 
-1.  Create a new Linux machine (using virtualbox).
-2.  Install the tools (using setup-linux-environment.sh)
-3.  Run the tests.
-4.  Leave a virtual machine running with the full test environment available for use.
+1.  Mount local files to the virtualbox instance
+2.  Create a new Linux machine (using virtualbox).
+3.  Install the tools (using setup-linux-environment.sh)
+4.  Run the tests.
+5.  Leave a virtual machine running with the full test environment available for use.
 
 Running `make` again will run the tests again in the existing environment.
 

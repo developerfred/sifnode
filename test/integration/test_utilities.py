@@ -5,6 +5,8 @@ import sys
 import time
 import traceback
 
+PEGGYETH = "ceth"
+
 persistantLog = open("/tmp/testrun.sh", "a")
 
 
@@ -85,6 +87,7 @@ def wait_for_balance(balance_fn, target_balance, max_attempts=30):
     while True:
         balance = balance_fn()
         if balance == target_balance:
+            print("got target balance")
             return target_balance
         else:
             print(f"waiting for target balance t: {target_balance} b:{balance}")
@@ -97,6 +100,14 @@ def wait_for_balance(balance_fn, target_balance, max_attempts=30):
 
 def wait_for_sifchain_balance(user, denom, network_password, target_balance, max_attempts=30):
     wait_for_balance(lambda: int(get_sifchain_balance(user, denom, network_password)), target_balance, max_attempts)
+
+
+def burn_peggy_coin(user, eth_user, amount):
+    command_line = f"""yes {network_password} | sifnodecli tx ethbridge burn {get_user_account(user, network_password)} \
+    {eth_user} {amount} {PEGGYETH} \
+    --ethereum-chain-id=3 --from={user} \
+    --yes"""
+    return get_shell_output(command_line)
 
 
 def amount_in_wei(amount):
