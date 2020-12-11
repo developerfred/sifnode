@@ -3,7 +3,10 @@
 # where to mount the sifnode tree
 BASEDIR=/sifnode
 
-all: test
+.PHONY: all
+all: 
+	-$(MAKE) test
+	$(MAKE) pulldata
 
 .depend data: 
 	mkdir -p $@
@@ -17,8 +20,8 @@ all: test
 	touch $@
 
 .PHONY: test
-test: .depend/setup
-	vagrant ssh -c "cd ${BASEDIR} && bash -x test/integration/start-integration-env.sh"
+test: .depend/setup data
+	vagrant ssh -c "cd ${BASEDIR} && bash -x test/integration/start-integration-env.sh" 2>&1 | tee data/testrun.sh
 
 # convenience targets
 

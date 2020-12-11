@@ -1,3 +1,4 @@
 /vagrantenv.sh
 /.vagrant/
 /.depend/
+/data/
