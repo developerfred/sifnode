@@ -40,6 +40,7 @@ pulldata: data
 	@vagrant ssh -c "docker logs genesis_ganachecli_1" > data/ganachelog.txt
 	@vagrant ssh -c "docker logs genesis_ganachecli_1" > data/ganachelog.txt
 	@vagrant ssh -c "cat /sifnode/smart-contracts/.env" > data/env
+	@vagrant ssh -c "cat /sifnode/test/integration/vagrantenv.sh" > data/vagrantenv.sh
 	@vagrant ssh -c "cd /sifnode/smart-contracts && truffle networks" > data/trufflenetworks.txt
 	
 cmds:
